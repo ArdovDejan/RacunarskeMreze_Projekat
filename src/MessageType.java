@@ -1,5 +1,10 @@
 public enum MessageType {
     LOGIN,
     USER_LIST,
-    CHAT_MSG
+    CHAT_MSG,
+    INVITE,
+    GAME_INVITE_RECEIVED,
+    INVITE_ACCEPTED_NOTIFY,
+    INVITE_ACCEPT,
+    START_GAME
 }
