@@ -2,6 +2,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class Server {
     private static final int PORT = 12345;
@@ -28,5 +30,13 @@ public class Server {
         for (ClientHandler handler : clients.values()) {
             handler.send(message);
         }
+    }
+
+    public static Map<String, Boolean> statusSvihKorisnika() {
+        Map<String, Boolean> rezultat = new LinkedHashMap<>();
+        for (ClientHandler h : clients.values()) {
+            rezultat.put(h.getUsername(), h.isUIgri());
+        }
+        return rezultat;
     }
 }

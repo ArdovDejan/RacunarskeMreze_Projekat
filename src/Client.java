@@ -2,6 +2,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 import java.util.Arrays;
+import java.util.Map;
 
 public class Client {
     private ObjectOutputStream out;
@@ -18,7 +19,10 @@ public class Client {
                 while (true) {
                     Message msg = (Message) in.readObject();
                     if (msg.getType() == MessageType.USER_LIST) {
-                        System.out.println("Korisnici: " + msg.getPayload());
+                        Map<String, Boolean> statusi = (Map<String, Boolean>) msg.getPayload();
+                        for (var e : statusi.entrySet()) {
+                            System.out.println(e.getKey() + (e.getValue() ? " (u igri)" : " (slobodan)"));
+                        }
                     } else if (msg.getType() == MessageType.CHAT_MSG) {
                         System.out.println((String) msg.getPayload());
                     }else if (msg.getType() == MessageType.GAME_INVITE_RECEIVED) {

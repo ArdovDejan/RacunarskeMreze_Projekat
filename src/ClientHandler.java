@@ -44,7 +44,7 @@ public class ClientHandler implements Runnable {
             username = (String) loginMsg.getPayload();
             Server.clients.put(username, this);
             System.out.println(username + " se prijavio.");
-            Server.broadcast(new Message(MessageType.USER_LIST, new ArrayList<>(Server.clients.keySet())));
+            Server.broadcast(new Message(MessageType.USER_LIST, Server.statusSvihKorisnika()));
 
             while (true) {
                 Message msg = (Message) in.readObject();
@@ -74,14 +74,20 @@ public class ClientHandler implements Runnable {
 
                 } else if (msg.getType() == MessageType.INVITE_ACCEPT) {
                     String kreator = (String) msg.getPayload();
-                    List<String> prihvatili = Server.activeInvites.get(kreator);
-                    if (prihvatili != null) {
-                        prihvatili.add(username);
-                        System.out.println(username + " je prihvatio poziv od " + kreator);
 
-                        ClientHandler kreatorHandler = Server.clients.get(kreator);
-                        if (kreatorHandler != null) {
-                            kreatorHandler.send(new Message(MessageType.INVITE_ACCEPTED_NOTIFY, username));
+                    if (uIgri) {
+                        send(new Message(MessageType.CHAT_MSG, "Vec si prihvatio poziv ili si u partiji."));
+                    } else {
+                        List<String> prihvatili = Server.activeInvites.get(kreator);
+                        if(prihvatili != null){
+                            prihvatili.add(username);
+                            uIgri=true;
+                            System.out.println(username + " je prihvatio poziv od " + kreator);
+
+                            ClientHandler kreatorHandler = Server.clients.get(kreator);
+                            if (kreatorHandler != null) {
+                                kreatorHandler.send(new Message(MessageType.INVITE_ACCEPTED_NOTIFY, username));
+                            }
                         }
 
                     }
@@ -98,6 +104,7 @@ public class ClientHandler implements Runnable {
                         GameSession sesija = new GameSession(igraci, Server.asocijacije);
                         for (ClientHandler h : igraci) {
                             h.setUIgri(true);
+                            Server.broadcast(new Message(MessageType.USER_LIST, Server.statusSvihKorisnika()));
                             h.setCurrentGame(sesija);
                         }
                         new Thread(sesija).start();
@@ -119,7 +126,7 @@ public class ClientHandler implements Runnable {
         } finally {
             if (username != null) {
                 Server.clients.remove(username);
-                Server.broadcast(new Message(MessageType.USER_LIST, new ArrayList<>(Server.clients.keySet())));
+                Server.broadcast(new Message(MessageType.USER_LIST, Server.statusSvihKorisnika()));
             }
         }
     }

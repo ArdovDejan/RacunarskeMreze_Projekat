@@ -28,6 +28,7 @@ public class GameSession implements Runnable {
             h.setUIgri(false);
             h.setCurrentGame(null);
         }
+        Server.broadcast(new Message(MessageType.USER_LIST, Server.statusSvihKorisnika()));
     }
 
     private void igrajRundu(Asocijacija a) {
