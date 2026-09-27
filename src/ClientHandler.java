@@ -87,19 +87,22 @@ public class ClientHandler implements Runnable {
                         send(new Message(MessageType.CHAT_MSG, "Vec si prihvatio poziv ili si u partiji."));
                     } else {
                         List<String> prihvatili = Server.activeInvites.get(kreator);
-                        if(prihvatili != null){
+                        if (prihvatili == null) {
+                            send(new Message(MessageType.CHAT_MSG, "Taj poziv vise ne postoji."));
+                        } else if (prihvatili.size() >= 5) {
+                            send(new Message(MessageType.CHAT_MSG, "Partija je puna (max 6 igraca)."));
+                        } else {
                             prihvatili.add(username);
                             uIgri=true;
                             System.out.println(username + " je prihvatio poziv od " + kreator);
 
                             ClientHandler kreatorHandler = Server.clients.get(kreator);
                             if (kreatorHandler != null) {
+                                kreatorHandler.setUIgri(true);
                                 kreatorHandler.send(new Message(MessageType.INVITE_ACCEPTED_NOTIFY, username));
                             }
                         }
-
                     }
-
                 } else if (msg.getType() == MessageType.START_GAME) {
                     List<String> prihvatili = Server.activeInvites.get(username);
                     if (prihvatili != null && !prihvatili.isEmpty()) {
@@ -131,6 +134,7 @@ public class ClientHandler implements Runnable {
                                 h.setUIgri(false);
                             }
                         }
+                        uIgri=false;
                         System.out.println(username + " je otkazao svoj poziv.");
                     } else if (uIgri) {
                         //prihvatio poziv
