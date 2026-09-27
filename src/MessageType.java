@@ -14,5 +14,6 @@ public enum MessageType {
     BOARD_STATE,
     ROUND_END,
     SCORE_UPDATE,
-    GAME_END
+    GAME_END,
+    CANCEL
 }

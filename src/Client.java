@@ -116,6 +116,8 @@ public class Client {
                 } else {
                     client.send(new Message(MessageType.GUESS_FINAL, rjesenje));
                 }
+            } else if (text.equals("/cancel")) {
+                client.send(new Message(MessageType.CANCEL, null));
             } else {
                 client.send(new Message(MessageType.CHAT_MSG, username + ": " + text));
             }

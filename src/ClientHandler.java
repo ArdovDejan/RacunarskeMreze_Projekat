@@ -113,6 +113,27 @@ public class ClientHandler implements Runnable {
                         System.out.println("Partija pokrenuta: " + username + " + " + prihvatili);
                     }
 
+                } else if (msg.getType() == MessageType.CANCEL) {
+                    List<String> prihvatili = Server.activeInvites.remove(username);
+                    if (prihvatili != null) {
+                        //kreator
+                        for (String ime : prihvatili) {
+                            ClientHandler h = Server.clients.get(ime);
+                            if (h != null){
+                                h.setUIgri(false);
+                            }
+                        }
+                        System.out.println(username + " je otkazao svoj poziv.");
+                    } else if (uIgri) {
+                        //prihvatio poziv
+                        for (List<String> lista : Server.activeInvites.values()) {
+                            lista.remove(username);
+                        }
+                        uIgri = false;
+                        System.out.println(username + " je otkazao svoje prihvatanje.");
+                    }
+                    Server.broadcast(new Message(MessageType.USER_LIST, Server.statusSvihKorisnika()));
+
                 } else if (msg.getType() == MessageType.OPEN_FIELD
                         || msg.getType() == MessageType.GUESS_COLUMN
                         || msg.getType() == MessageType.GUESS_FINAL) {
