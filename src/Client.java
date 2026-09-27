@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Arrays;
 import java.util.Map;
@@ -76,7 +77,7 @@ public class Client {
 
             if (text.startsWith("/invite ")) {
                 String[] imena = text.substring(8).split(",");
-                client.send(new Message(MessageType.INVITE, Arrays.asList(imena)));
+                client.send(new Message(MessageType.INVITE, new ArrayList<>(Arrays.asList(imena))));
             } else if (text.startsWith("/accept ")) {
                 String kreator = text.substring(8).trim();
                 client.send(new Message(MessageType.INVITE_ACCEPT, kreator));

@@ -61,17 +61,25 @@ public class ClientHandler implements Runnable {
                     }
 
                 } else if (msg.getType() == MessageType.INVITE) {
-                    List<String> pozvani = (List<String>) msg.getPayload();
-                    Server.activeInvites.putIfAbsent(username, new ArrayList<>());
-                    //System.out.println(Server.activeInvites.toString());
-                    for (String ime : pozvani) {
-                        ClientHandler h = Server.clients.get(ime);
-                        if (h != null && !h.isUIgri()) {
-                            h.send(new Message(MessageType.GAME_INVITE_RECEIVED, username));
+                    if (uIgri) {
+                        send(new Message(MessageType.CHAT_MSG, "Vec si u partiji, ne mozes pozivati druge."));
+                    } else {
+                        List<String> pozvani = (List<String>) msg.getPayload();
+                        pozvani.remove(username);
+
+                        if (pozvani.isEmpty()) {
+                            send(new Message(MessageType.CHAT_MSG, "Ne mozes pozvati sam sebe."));
+                        } else {
+                            Server.activeInvites.put(username, new ArrayList<>());
+                            for (String ime : pozvani) {
+                                ClientHandler h = Server.clients.get(ime);
+                                if (h != null && !h.isUIgri()) {
+                                    h.send(new Message(MessageType.GAME_INVITE_RECEIVED, username));
+                                }
+                            }
+                            System.out.println(username + " je pozvao: " + pozvani);
                         }
                     }
-                    System.out.println(username + " je pozvao: " + pozvani);
-
                 } else if (msg.getType() == MessageType.INVITE_ACCEPT) {
                     String kreator = (String) msg.getPayload();
 
