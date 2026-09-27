@@ -9,11 +9,13 @@ public class Server {
 
     public static final ConcurrentHashMap<String, List<String>> activeInvites = new ConcurrentHashMap<>();
 
+    public static List<Asocijacija> asocijacije;
+
     public static void main(String[] args) throws Exception {
         ServerSocket serverSocket = new ServerSocket(PORT);
         System.out.println("Server pokrenut na portu " + PORT);
 
-        var asocijacije = AsocijacijeLoader.ucitaj("asocijacije.txt");
+        asocijacije = AsocijacijeLoader.ucitaj("asocijacije.txt");
         System.out.println("Ucitano asocijacija: " + asocijacije.size());
 
         while (true) {

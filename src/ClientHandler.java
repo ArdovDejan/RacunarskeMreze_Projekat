@@ -9,6 +9,7 @@ public class ClientHandler implements Runnable {
     private ObjectInputStream in;
     private String username;
     private boolean uIgri = false;
+    private GameSession currentGame;
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -20,6 +21,14 @@ public class ClientHandler implements Runnable {
 
     public boolean isUIgri() {
         return uIgri;
+    }
+
+    public void setCurrentGame(GameSession g) {
+        this.currentGame = g;
+    }
+
+    public void setUIgri(boolean vrijednost) {
+        this.uIgri = vrijednost;
     }
 
     public void run() {
@@ -70,11 +79,28 @@ public class ClientHandler implements Runnable {
                 } else if (msg.getType() == MessageType.START_GAME) {
                     List<String> prihvatili = Server.activeInvites.get(username);
                     if (prihvatili != null && !prihvatili.isEmpty()) {
-                        System.out.println("Partija kreće! Kreator: " + username + ", igraci: " + prihvatili);
+                        List<ClientHandler> igraci = new ArrayList<>();
+                        igraci.add(this); //kreator
+                        for (String ime : prihvatili) {
+                            igraci.add(Server.clients.get(ime));
+                        }
+
+                        GameSession sesija = new GameSession(igraci, Server.asocijacije);
+                        for (ClientHandler h : igraci) {
+                            h.setUIgri(true);
+                            h.setCurrentGame(sesija);
+                        }
+                        new Thread(sesija).start();
 
                         Server.activeInvites.remove(username);
-                    } else {
-                        System.out.println(username + " je pokusao da pokrene partiju bez prihvacenih igraca.");
+                        System.out.println("Partija pokrenuta: " + username + " + " + prihvatili);
+                    }
+
+                } else if (msg.getType() == MessageType.OPEN_FIELD
+                        || msg.getType() == MessageType.GUESS_COLUMN
+                        || msg.getType() == MessageType.GUESS_FINAL) {
+                    if (currentGame != null) {
+                        currentGame.handleMessage(this, msg);
                     }
                 }
             }
