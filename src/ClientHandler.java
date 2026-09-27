@@ -27,6 +27,10 @@ public class ClientHandler implements Runnable {
         this.currentGame = g;
     }
 
+    public GameSession getCurrentGame() {
+        return currentGame;
+    }
+
     public void setUIgri(boolean vrijednost) {
         this.uIgri = vrijednost;
     }
@@ -46,8 +50,14 @@ public class ClientHandler implements Runnable {
                 Message msg = (Message) in.readObject();
 
                 if (msg.getType() == MessageType.CHAT_MSG) {
-                    for (ClientHandler h : Server.clients.values()) {
-                        if (h != this) h.send(msg);
+                    if (currentGame != null) {
+                        currentGame.handleChat(this, msg);
+                    } else {
+                        for (ClientHandler h : Server.clients.values()) {
+                            if (h != this && h.getCurrentGame() == null) {
+                                h.send(msg);
+                            }
+                        }
                     }
 
                 } else if (msg.getType() == MessageType.INVITE) {

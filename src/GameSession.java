@@ -116,6 +116,15 @@ public class GameSession implements Runnable {
         }
     }
 
+    public void handleChat(ClientHandler posiljalac, Message msg) {
+        for (ClientHandler h : igraci) {
+            if (h != posiljalac) {
+                h.send(msg);
+            }
+        }
+    }
+
+
     private void objaviPobjednika() {
         String pobjednik = null;
         int max = -1;
