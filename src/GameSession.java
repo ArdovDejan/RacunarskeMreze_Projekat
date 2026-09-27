@@ -135,14 +135,22 @@ public class GameSession implements Runnable {
 
 
     private void objaviPobjednika() {
-        String pobjednik = null;
         int max = -1;
+        for (int bod : bodovi.values()) {
+            if (bod > max) max = bod;
+        }
+
+        List<String> najbolji = new ArrayList<>();
         for (var e : bodovi.entrySet()) {
-            if (e.getValue() > max) {
-                max = e.getValue();
-                pobjednik = e.getKey();
+            if (e.getValue() == max) {
+                najbolji.add(e.getKey());
             }
         }
-        posaljiSvima(new Message(MessageType.GAME_END, pobjednik + " je pobjednik sa " + max + " poena!"));
+
+        if (najbolji.size() == 1) {
+            posaljiSvima(new Message(MessageType.GAME_END, najbolji.get(0) + " je pobjednik sa " + max + " poena!"));
+        } else {
+            posaljiSvima(new Message(MessageType.GAME_END, "Izjednaceno izmedju: " + najbolji + " sa " + max + " poena!"));
+        }
     }
 }
