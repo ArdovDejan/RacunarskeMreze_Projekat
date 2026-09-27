@@ -79,6 +79,14 @@ public class GameSession implements Runnable {
                 int poeni = Math.max(4 - otvorenaPolja, 1);
                 dodajBodove(posiljalac.getUsername(), poeni);
                 posaljiSvima(new Message(MessageType.CHAT_MSG,posiljalac.getUsername() + " je pogodio kolonu (+" + poeni + " poena)"));
+
+                for (int r = 0; r < 4; r++) {
+                    if (!otvoreno[k][r]) {
+                        otvoreno[k][r] = true;
+                        String pojam = trenutna.getKolone()[k].getPojmovi()[r];
+                        posaljiSvima(new Message(MessageType.FIELD_OPENED, new Object[]{k, r, pojam}));
+                    }
+                }
             }
 
         } else if (msg.getType() == MessageType.GUESS_FINAL) {
